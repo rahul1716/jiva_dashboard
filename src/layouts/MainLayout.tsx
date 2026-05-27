@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search, Moon, Bell } from "lucide-react";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -11,14 +10,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
 
-  // Handle window resize to detect mobile/desktop
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 1024);
-      if (window.innerWidth >= 1024) setSidebarOpen(false); // Close sidebar when resizing to desktop
+      if (window.innerWidth >= 1024) setSidebarOpen(false);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -26,7 +24,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {/* Desktop Sidebar - Only render on large screens */}
+      {/* Desktop Sidebar */}
       {!isMobile && (
         <div className="w-64 fixed inset-y-0 left-0 bg-white border-r border-gray-200 flex">
           <Sidebar />
@@ -56,91 +54,80 @@ export default function MainLayout({ children }: MainLayoutProps) {
       {/* Main Content Area */}
       <div className={`flex-1 flex flex-col w-full ${!isMobile ? "ml-64" : ""}`}>
         {/* Navbar */}
-        <nav className={`fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center px-4 sm:px-6 gap-4 z-50 ${
-          !isMobile ? "left-64" : "left-0"
-        }`}>
+        <nav
+          className={`fixed top-0 right-0 h-16 bg-white border-b border-gray-200 flex items-center px-5 gap-4 z-50 ${
+            !isMobile ? "left-64" : "left-0"
+          }`}
+        >
           {/* Mobile Menu Button */}
           <button
             onClick={toggleSidebar}
-            className="lg:hidden text-gray-600 hover:text-gray-900 transition-colors p-2 -ml-2"
+            className="lg:hidden text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors -ml-1"
             aria-label="Toggle sidebar"
           >
-            {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+
+          {/* Sidebar grid icon — desktop only */}
+          <button
+            onClick={toggleSidebar}
+            className="hidden lg:flex text-gray-500 hover:text-gray-700 hover:bg-gray-100 p-2 rounded-lg transition-colors flex-shrink-0"
+            aria-label="Toggle sidebar"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              viewBox="0 0 24 24"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
           </button>
 
           {/* Search Bar */}
           <div className="flex-1 max-w-sm">
-            <div className="relative hidden sm:block">
-              <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
+            <div className="relative">
+              <Search
+                size={15}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              />
               <input
                 type="text"
-                placeholder="Search users..."
-                className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition-all"
+                placeholder="Search"
+                className="w-full pl-9 pr-4 py-2 text-sm bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all"
               />
             </div>
           </div>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2 sm:gap-4">
-            {/* Notification Button */}
-            <button className="relative text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+          <div className="flex items-center gap-1 ml-auto">
+            {/* Dark Mode */}
+            <button className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              <Moon size={18} />
             </button>
 
-            {/* Settings Button */}
-            <button className="hidden sm:flex text-gray-600 hover:text-gray-900 transition-colors p-2 rounded-lg hover:bg-gray-100">
-              <svg
-                className="w-5 h-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24M1 12h6m6 0h6m-17.78 7.78l4.24-4.24m2.12-2.12l4.24-4.24" />
-              </svg>
-            </button>
-
-            {/* Profile Button */}
-            <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
-              <img
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin"
-                alt="profile"
-                className="w-8 h-8 rounded-full"
-              />
-              <span className="hidden sm:inline text-sm font-medium text-gray-700 max-w-[100px] truncate">
-                Admin
+            {/* Notifications */}
+            <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+              <Bell size={18} />
+              <span className="absolute top-1.5 right-1.5 w-3.5 h-3.5 bg-red-600 text-white rounded-full text-[9px] flex items-center justify-center font-bold border-2 border-white">
+                1
               </span>
+            </button>
+
+            {/* Avatar */}
+            <button className="w-8 h-8 rounded-full bg-green-600 text-white text-xs font-semibold flex items-center justify-center ml-1 flex-shrink-0">
+              RV
             </button>
           </div>
         </nav>
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto pt-20 pb-6 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
     </div>

@@ -272,8 +272,15 @@ export const sidebarMenuItems = [
 ];
 
 export const currentUser = {
-  name: "Admin User",
-  email: "admin@jiva.com",
-  role: "Administrator",
-  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Admin",
+  name: "Rahul verma",
+  email: "rahul.verma@jiva.com",
+  role: "Super Admin",
+  avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=RahulVerma",
+  initials: "RV",
+  phone: "+91 98765 43210",
+  department: "Engineering",
+  joinedAt: "2023-01-15",
+  lastActive: new Date().toISOString(),
+  permissions: ["read", "write", "delete", "manage_users", "manage_settings"],
+  isActive: true,
 };
