@@ -25,6 +25,7 @@ interface UserTableProps {
 export default function UserTable({ users, onEdit, onDelete }: UserTableProps) {
   const [genderFilter, setGenderFilter] = useState("All");
   const [ageRangeFilter, setAgeRangeFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -57,6 +58,25 @@ export default function UserTable({ users, onEdit, onDelete }: UserTableProps) {
             <option>18–35 years</option>
             <option>36–59 years</option>
             <option>60+ years</option>
+          </select>
+        </div>
+
+        {/* Status Filter - Professional Styled */}
+        <div className="flex-1 min-w-48">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className={`w-full px-4 py-2.5 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:border-transparent bg-white cursor-pointer transition-all border-2 appearance-none ${
+              statusFilter === "Active"
+                ? "border-blue-500 text-blue-700 bg-blue-50 hover:bg-blue-100"
+                : statusFilter === "Inactive"
+                ? "border-gray-400 text-gray-700 hover:border-gray-500 hover:bg-gray-50"
+                : "border-gray-300 text-gray-700 hover:border-gray-400"
+            }`}
+          >
+            <option value="All" className="text-gray-700">All Status</option>
+            <option value="Active" className="text-gray-900 font-medium">✓ Active</option>
+            <option value="Inactive" className="text-gray-900 font-medium">○ Inactive</option>
           </select>
         </div>
       </div>
