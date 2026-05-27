@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Edit2, Eye, Trash2, Star } from "lucide-react";
+import { useState } from "react";
 
 interface User {
   id: number;
@@ -22,8 +23,44 @@ interface UserTableProps {
 }
 
 export default function UserTable({ users, onEdit, onDelete }: UserTableProps) {
+  const [genderFilter, setGenderFilter] = useState("All");
+  const [ageRangeFilter, setAgeRangeFilter] = useState("All");
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      {/* Filter Section */}
+      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50 flex flex-wrap gap-4">
+        {/* Gender Filter */}
+        <div className="flex-1 min-w-48">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+          <select
+            value={genderFilter}
+            onChange={(e) => setGenderFilter(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white cursor-pointer hover:border-gray-400 transition-all"
+          >
+            <option>All</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+
+        {/* Age Range Filter */}
+        <div className="flex-1 min-w-48">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Age Range</label>
+          <select
+            value={ageRangeFilter}
+            onChange={(e) => setAgeRangeFilter(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white cursor-pointer hover:border-gray-400 transition-all"
+          >
+            <option>All</option>
+            <option>13–17 years</option>
+            <option>18–35 years</option>
+            <option>36–59 years</option>
+            <option>60+ years</option>
+          </select>
+        </div>
+      </div>
+
       {/* Desktop Table View */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">

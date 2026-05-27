@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit2, MoreVertical, Download, Eye, Plus, Trash2, Package, FlaskConical, Stethoscope, CreditCard, Phone, Calendar } from "lucide-react";
+import { ArrowLeft, Edit2, MoreVertical, Download, Eye, Plus, Trash2, Package, FlaskConical, Stethoscope, CreditCard, Phone, Calendar, Home, Heart } from "lucide-react";
 import StatCard from "../components/StatCard";
 import { mockUserDetail, mockUsers } from "../data/mockData";
 
@@ -190,6 +190,54 @@ export default function UserDetail() {
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  
+  // Get the user from mockUsers array based on the ID, with detailed info from mockUserDetail
+  const getUserData = () => {
+    const userId = parseInt(id || "1");
+    const baseUser = mockUsers.find(u => u.id === userId);
+    
+    if (!baseUser) {
+      return mockUserDetail;
+    }
+
+    // Merge base user data with detailed user info
+    return {
+      ...baseUser,
+      dob: "5/15/1990",
+      gender: "Female",
+      bloodGroup: "O+",
+      joinedDate: "1/15/2025",
+      lastActive: "4/2/2026",
+      city: "New York",
+      state: "NY",
+      zipCode: "10001",
+      country: "United States",
+      addresses: [
+        {
+          id: 1,
+          type: "Home",
+          address: "Flat 301, Sunshine Apartments, MG Road",
+          fullAddress: "Flat 301, Sunshine Apartments, MG Road, Mumbai, Maharashtra 400001, India",
+          isDefault: true,
+        },
+        {
+          id: 2,
+          type: "Home",
+          address: "Flat 301, Sunshine Apartments, MG Road",
+          fullAddress: "Flat 301, Sunshine Apartments, MG Road, Mumbai, Maharashtra 400001, India",
+          isDefault: false,
+        },
+      ],
+      isPrime: baseUser.isPrime,
+      stats: [
+        { label: "Total Orders", value: "6", icon: "ShoppingCart" },
+        { label: "Total Booking & Appointment", value: "5", icon: "Calendar" },
+        { label: "Total Family Member", value: "10", icon: "Users" },
+        { label: "Total Spent", value: "₹24500.00", icon: "DollarSign" },
+      ],
+    };
+  };
+
   const [familyMembers, setFamilyMembers] = useState([
     { id: 1, name: "John Williams",   relation: "Husband",       phone: "+91 98001 11112", dob: "3/20/1988", initials: "JW", color: "bg-blue-500" },
     { id: 2, name: "Emma Williams",   relation: "Daughter",      phone: "+91 98002 22223", dob: "7/14/2012", initials: "EW", color: "bg-purple-500" },
@@ -207,18 +255,24 @@ export default function UserDetail() {
     phone: "",
     status: "Active",
   });
+  const [userData, setUserData] = useState(() => getUserData());
 
-  const user = mockUserDetail;
+  const user = userData;
+
+  // Update user data when ID changes
+  useEffect(() => {
+    setUserData(getUserData());
+  }, [id]);
 
   // Initialize form data when user loads
-  useState(() => {
+  useEffect(() => {
     setEditFormData({
       name: user.name,
       email: user.email,
       phone: user.phone,
       status: user.status,
     });
-  }, [user]);
+  }, [user.name, user.email, user.phone, user.status]);
 
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -226,7 +280,16 @@ export default function UserDetail() {
   };
 
   const handleSaveEdit = () => {
-    alert(`Profile updated!\nName: ${editFormData.name}\nEmail: ${editFormData.email}\nPhone: ${editFormData.phone}\nStatus: ${editFormData.status}`);
+    // Update the user data with the edited form data
+    setUserData(prevData => ({
+      ...prevData,
+      name: editFormData.name,
+      email: editFormData.email,
+      phone: editFormData.phone,
+      status: editFormData.status,
+    }));
+    // Show success message
+    alert(`Profile updated successfully!\nName: ${editFormData.name}\nEmail: ${editFormData.email}\nPhone: ${editFormData.phone}\nStatus: ${editFormData.status}`);
     setIsEditModalOpen(false);
   };
 
@@ -284,34 +347,63 @@ export default function UserDetail() {
         className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
       >
         <ArrowLeft size={20} />
-        Back to Users
+        Back to User Management
       </button>
 
       {/* User Profile Card */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-          <div className="flex items-start gap-4">
-            <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-lg" />
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
-                <span className="px-3 py-1 bg-green-50 text-green-700 text-sm font-medium rounded-full">{user.status}</span>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          {/* Left Side: Avatar + Info */}
+          <div className="flex items-start gap-3 flex-1">
+            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+              {user.name.split(' ').map((n: string) => n[0]).join('')}
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl font-bold text-gray-900">{user.name}</h1>
+              <div className="flex flex-wrap items-center gap-2 mt-2 mb-2">
+                {user.status && <span className="px-2 py-0.5 bg-green-50 text-green-700 text-xs font-medium rounded">{user.status}</span>}
+                {user.role && <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded">{user.role}</span>}
+                <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded">Normal User</span>
+                <span className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded">ID: #{user.id}</span>
               </div>
-              <p className="text-gray-600 mt-1">{user.email}</p>
-              <p className="text-gray-600 text-sm">{user.phone}</p>
-              <p className="text-gray-500 text-sm mt-2">Joined {user.joinedDate}</p>
+              <div className="flex flex-wrap items-center gap-4 text-xs text-gray-600">
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} className="text-gray-400" />
+                  Joined {user.joinedDate}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Eye size={14} className="text-gray-400" />
+                  Last active {user.lastActive}
+                </span>
+              </div>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setIsEditModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-            >
-              <Edit2 size={18} /> Edit Profile
+
+          {/* Right Side: Buttons + Status */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
+            <button className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-colors font-medium text-sm flex items-center gap-2 justify-center whitespace-nowrap">
+              ★ Upgrade to Prime
             </button>
-            <button className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              <MoreVertical size={18} className="text-gray-600" />
-            </button>
+            <div className="relative w-full sm:w-auto">
+              <select
+                value={editFormData.status}
+                onChange={handleEditChange}
+                name="status"
+                className={`w-full px-4 py-2.5 rounded-lg font-semibold text-sm appearance-none cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md ${
+                  editFormData.status === "Active"
+                    ? "bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 border-2 border-green-500 text-green-700 hover:from-green-100 hover:via-emerald-100 hover:to-green-100 hover:border-green-600 focus:ring-2 focus:ring-green-300"
+                    : "bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-300 text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 focus:ring-2 focus:ring-gray-300"
+                } pl-4 pr-10 py-2`}
+              >
+                <option value="Active" className="bg-white text-gray-900">✓ Active</option>
+                <option value="Inactive" className="bg-white text-gray-900">○ Inactive</option>
+              </select>
+              <svg className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 pointer-events-none transition-colors duration-300 ${
+                editFormData.status === "Active" ? "text-green-600" : "text-gray-500"
+              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+            </div>
           </div>
         </div>
       </div>
@@ -345,52 +437,91 @@ export default function UserDetail() {
           {/* ── OVERVIEW ── */}
           {activeTab === "overview" && (
             <div className="space-y-6">
-              {/* Personal Information */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-lg p-6">
-                  <div>
-                    <p className="text-sm text-gray-600">Full Name</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.name}</p>
+              {/* Two Column Layout: Personal Info (Left) + Addresses (Right) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Personal Information - Left Side */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+                    <button
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium text-sm"
+                    >
+                      <Edit2 size={16} /> Edit
+                    </button>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Email</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Phone</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.phone}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Status</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.status}</p>
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <CreditCard size={16} className="text-gray-400 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500">Email</p>
+                        <p className="font-medium text-gray-900">{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Phone size={16} className="text-gray-400 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500">Phone</p>
+                        <p className="font-medium text-gray-900">{user.phone}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Calendar size={16} className="text-gray-400 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500">Date of Birth</p>
+                        <p className="font-medium text-gray-900">{user.dob}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Eye size={16} className="text-gray-400 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500">Gender</p>
+                        <p className="font-medium text-gray-900">{user.gender}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Heart size={16} className="text-gray-400 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500">Blood Group</p>
+                        <p className="font-medium text-gray-900">{user.bloodGroup}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Address */}
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Address</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 rounded-lg p-6">
-                  <div className="md:col-span-2">
-                    <p className="text-sm text-gray-600">Street Address</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.address}</p>
+                {/* Addresses - Right Side */}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900">Addresses</h3>
+                    <button className="text-green-600 hover:text-green-700 font-medium text-sm">+ Add</button>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600">City</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.city}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">State</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.state}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Zip Code</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.zipCode}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Country</p>
-                    <p className="text-gray-900 font-medium mt-1">{user.country}</p>
+                  <div className="space-y-3">
+                    {user.addresses && user.addresses.map((addr: any) => (
+                      <div key={addr.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-3 flex-1">
+                            <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+                              <Home size={18} className="text-green-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <p className="font-semibold text-gray-900">{addr.type}</p>
+                                {addr.isDefault && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded">Default</span>}
+                              </div>
+                              <p className="text-sm text-gray-600">{addr.fullAddress}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-1 flex-shrink-0">
+                            <button className="p-1.5 text-gray-400 hover:text-green-600 transition-colors rounded">
+                              <Edit2 size={14} />
+                            </button>
+                            <button className="p-1.5 text-gray-400 hover:text-red-500 transition-colors rounded">
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
