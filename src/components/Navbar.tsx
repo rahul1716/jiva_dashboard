@@ -45,9 +45,9 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
         </button>
 
         {/* Settings Icon */}
-        <button className="text-gray-600 hover:text-gray-900 transition-colors">
+        {/* <button className="text-gray-600 hover:text-gray-900 transition-colors">
           <Settings size={20} />
-        </button>
+        </button> */}
 
         {/* Profile Avatar */}
         <button className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
